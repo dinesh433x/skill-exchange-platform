@@ -4,6 +4,9 @@ require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 
+const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+
 const app = express();
 const server = http.createServer(app);
 
@@ -13,6 +16,9 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/user", profileRoutes);
 
 app.get("/ping", (req, res) => {
   res.send("Server running");
