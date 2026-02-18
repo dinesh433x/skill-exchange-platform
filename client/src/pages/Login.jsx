@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { loginUser, registerUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
@@ -12,6 +16,14 @@ const LoginPage = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
+      navigate("/dashboard");
+    }
+  }, [navigate, searchParams]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -79,7 +91,7 @@ const LoginPage = () => {
         });
       }
       const { token } = response.data;
-      // ✅ Store JWT
+      //  Store JWT
       localStorage.setItem("token", token);
       // Redirect
       navigate("/dashboard");
@@ -89,9 +101,9 @@ const LoginPage = () => {
     }
   };
 
+  //  Google OAuth logic
   const handleGoogleAuth = () => {
-    console.log("Google OAuth initiated");
-    // Handle Google OAuth logic
+    window.location.href = "http://localhost:5000/api/auth/google";
   };
 
   return (
