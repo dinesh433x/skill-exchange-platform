@@ -8,6 +8,8 @@ const passport = require("./config/passport");
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 
+const skillRoutes = require("./routes/skillRoutes");
+
 const app = express();
 const server = http.createServer(app);
 
@@ -22,6 +24,7 @@ app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", profileRoutes);
+app.use("/api/skills", skillRoutes);
 
 app.get("/ping", (req, res) => {
   res.send("Server running");
