@@ -54,3 +54,15 @@ exports.login = async (req, res) => {
 
   res.json({ token, user });
 };
+// GET current logged-in user
+exports.getMe = async (req, res) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, name, email, bio")
+    .eq("id", req.user.userId)
+    .single();
+
+  if (error) return res.status(500).json(error);
+
+  res.json(data);
+};

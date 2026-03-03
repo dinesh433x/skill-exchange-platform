@@ -21,7 +21,7 @@ const LoginPage = () => {
     const token = searchParams.get("token");
     if (token) {
       localStorage.setItem("token", token);
-      navigate("/dashboard");
+      navigate("/profile");
     }
   }, [navigate, searchParams]);
 
@@ -94,7 +94,7 @@ const LoginPage = () => {
       //  Store JWT
       localStorage.setItem("token", token);
       // Redirect
-      navigate("/dashboard");
+      navigate("/profile");
     } catch (err) {
       console.error(err.response?.data || err.message);
       alert(err.response?.data?.message || "Authentication failed");
