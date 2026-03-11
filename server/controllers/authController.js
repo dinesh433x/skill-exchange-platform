@@ -56,13 +56,58 @@ exports.login = async (req, res) => {
 };
 // GET current logged-in user
 exports.getMe = async (req, res) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("id, name, email, bio")
-    .eq("id", req.user.userId)
-    .single();
+  try {
+    const userId = req.user.userId;
 
-  if (error) return res.status(500).json(error);
+    // get user
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("id, name, email, bio")
+      .eq("id", userId)
+      .single();
 
-  res.json(data);
+    if (userError) throw userError;
+
+    // get offered skills
+    const { data: offered } = await supabase
+      .from("user_skills_offered")
+      .select(
+        `
+        id,
+        level,
+        skills (
+          name
+        )
+      `,
+      )
+      .eq("user_id", userId);
+
+    // get wanted skills
+    const { data: wanted } = await supabase
+      .from("user_skills_wanted")
+      .select(
+        `
+        id,
+        skills (
+          name
+        )
+      `,
+      )
+      .eq("user_id", userId);
+
+    res.json({
+      ...user,
+      skillsOffered: offered.map((s) => ({
+        id: s.id,
+        name: s.skills.name,
+        level: s.level,
+      })),
+      skillsWanted: wanted.map((s) => ({
+        id: s.id,
+        name: s.skills.name,
+      })),
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

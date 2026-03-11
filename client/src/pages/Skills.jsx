@@ -3,19 +3,26 @@ import { getSkills, addOfferedSkill, addWantedSkill } from "../api/skills";
 
 const Skills = () => {
   const [skills, setSkills] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState([]);
+  const [searchTerm] = useState("");
   const [selectedOffered, setSelectedOffered] = useState("");
   const [selectedWanted, setSelectedWanted] = useState("");
   const [level, setLevel] = useState("Beginner");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     const fetchSkills = async () => {
       setIsLoading(true);
+      setError("");
       try {
         const res = await getSkills();
         setSkills(res.data);
+        setFilteredSkills(res.data);
       } catch (error) {
+        setError("Failed to fetch skills. Please try again.");
         console.error("Failed to fetch skills:", error);
       } finally {
         setIsLoading(false);
@@ -24,24 +31,30 @@ const Skills = () => {
     fetchSkills();
   }, []);
 
+  useEffect(() => {
+    setFilteredSkills(
+      skills.filter((skill) =>
+        skill.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    );
+  }, [searchTerm, skills]);
+
   const handleAddOffered = async () => {
     if (!selectedOffered) {
-      alert("Please select a skill");
+      setError("Please select a skill to offer.");
       return;
     }
-
     setIsSaving(true);
+    setError("");
+    setSuccess("");
     try {
-      await addOfferedSkill({
-        skillId: selectedOffered,
-        level,
-      });
-      alert("Skill added successfully!");
+      await addOfferedSkill({ skillId: selectedOffered, level });
+      setSuccess("Offered skill added successfully!");
       setSelectedOffered("");
       setLevel("Beginner");
     } catch (error) {
+      setError("Failed to add offered skill. Please try again.");
       console.error("Failed to add skill:", error);
-      alert("Failed to add skill");
     } finally {
       setIsSaving(false);
     }
@@ -49,20 +62,19 @@ const Skills = () => {
 
   const handleAddWanted = async () => {
     if (!selectedWanted) {
-      alert("Please select a skill");
+      setError("Please select a skill to learn.");
       return;
     }
-
     setIsSaving(true);
+    setError("");
+    setSuccess("");
     try {
-      await addWantedSkill({
-        skillId: selectedWanted,
-      });
-      alert("Skill added successfully!");
+      await addWantedSkill({ skillId: selectedWanted });
+      setSuccess("Wanted skill added successfully!");
       setSelectedWanted("");
     } catch (error) {
+      setError("Failed to add wanted skill. Please try again.");
       console.error("Failed to add skill:", error);
-      alert("Failed to add skill");
     } finally {
       setIsSaving(false);
     }
@@ -80,8 +92,8 @@ const Skills = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 pt-12">
+      <div className="w-full  px-6 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -91,6 +103,18 @@ const Skills = () => {
             Add skills you can teach and skills you want to learn
           </p>
         </div>
+
+        {/* Notifications */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+            {success}
+          </div>
+        )}
 
         {/* Cards Container */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,9 +143,7 @@ const Skills = () => {
                 <p className="text-sm text-gray-500">Share your expertise</p>
               </div>
             </div>
-
             <div className="space-y-4">
-              {/* Skill Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Skill
@@ -132,15 +154,13 @@ const Skills = () => {
                   className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                 >
                   <option value="">Choose a skill...</option>
-                  {skills.map((skill) => (
+                  {filteredSkills.map((skill) => (
                     <option key={skill.id} value={skill.id}>
                       {skill.name}
                     </option>
                   ))}
                 </select>
               </div>
-
-              {/* Level Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Your Level
@@ -156,8 +176,6 @@ const Skills = () => {
                   <option value="Expert">Expert</option>
                 </select>
               </div>
-
-              {/* Add Button */}
               <button
                 onClick={handleAddOffered}
                 disabled={isSaving || !selectedOffered}
@@ -234,9 +252,7 @@ const Skills = () => {
                 <p className="text-sm text-gray-500">Expand your knowledge</p>
               </div>
             </div>
-
             <div className="space-y-4">
-              {/* Skill Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Skill
@@ -247,23 +263,19 @@ const Skills = () => {
                   className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-900"
                 >
                   <option value="">Choose a skill...</option>
-                  {skills.map((skill) => (
+                  {filteredSkills.map((skill) => (
                     <option key={skill.id} value={skill.id}>
                       {skill.name}
                     </option>
                   ))}
                 </select>
               </div>
-
-              {/* Info Text */}
               <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
                 <p className="text-sm text-purple-700">
                   💡 Select skills you'd like to learn from others in the
                   community
                 </p>
               </div>
-
-              {/* Add Button */}
               <button
                 onClick={handleAddWanted}
                 disabled={isSaving || !selectedWanted}

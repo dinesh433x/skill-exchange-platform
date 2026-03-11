@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [bio, setBio] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -90,7 +93,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Hero Banner */}
       <div className="bg-linear-to-r from-blue-600 to-purple-600">
-        <div className="w-full px-6 py-12">
+        <div className="w-full px-6 py-9">
           <div className="flex items-center gap-6">
             {/* Avatar */}
             <div className="w-28 h-28 bg-white rounded-2xl shadow-lg flex items-center justify-center">
@@ -111,13 +114,13 @@ const Profile = () => {
             <div className="hidden lg:flex items-center gap-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">
-                  {user.skillsOffered?.length || 0}
+                  {user.skillsOffered.length || 0}
                 </div>
                 <div className="text-sm text-blue-100">Skills Offered</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">
-                  {user.skillsWanted?.length || 0}
+                  {user.skillsWanted.length || 0}
                 </div>
                 <div className="text-sm text-blue-100">Skills Wanted</div>
               </div>
@@ -235,39 +238,43 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Skills Offered */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0"
+                        />
+                      </svg>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      Skills I Can Teach
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Skills I Can Teach
-                  </h3>
                 </div>
 
-                {user.skillsOffered?.length ? (
+                {user.skillsOffered.length > 0 ? (
                   <div className="space-y-2">
-                    {user.skillsOffered.map((skillObj, index) => (
+                    {user.skillsOffered.map((skillObj) => (
                       <div
-                        key={index}
+                        key={skillObj.id}
                         className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
                       >
                         <span className="font-medium text-gray-900">
-                          {skillObj.skill?.name || skillObj.skill}
+                          {skillObj.name}
                         </span>
+
                         <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
-                          {skillObj.level || "Intermediate"}
+                          {skillObj.level}
                         </span>
                       </div>
                     ))}
@@ -277,7 +284,11 @@ const Profile = () => {
                     <p className="text-gray-400 text-sm mb-2">
                       No skills added yet
                     </p>
-                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+
+                    <button
+                      onClick={() => navigate("/skills")}
+                      className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                    >
                       Add Skills →
                     </button>
                   </div>
@@ -286,36 +297,39 @@ const Profile = () => {
 
               {/* Skills Wanted */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-purple-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-purple-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13"
+                        />
+                      </svg>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      Skills I Want to Learn
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Skills I Want to Learn
-                  </h3>
                 </div>
 
-                {user.skillsWanted?.length ? (
+                {user.skillsWanted.length > 0 ? (
                   <div className="space-y-2">
-                    {user.skillsWanted.map((skill, index) => (
+                    {user.skillsWanted.map((skill) => (
                       <div
-                        key={index}
+                        key={skill.id}
                         className="p-3 bg-purple-50 rounded-lg border border-purple-100"
                       >
                         <span className="font-medium text-gray-900">
-                          {skill.name || skill}
+                          {skill.name}
                         </span>
                       </div>
                     ))}
@@ -325,7 +339,11 @@ const Profile = () => {
                     <p className="text-gray-400 text-sm mb-2">
                       No skills added yet
                     </p>
-                    <button className="text-purple-600 hover:text-purple-700 font-medium text-sm">
+
+                    <button
+                      onClick={() => navigate("/skills")}
+                      className="text-purple-600 hover:text-purple-700 font-medium text-sm"
+                    >
                       Add Skills →
                     </button>
                   </div>
@@ -335,7 +353,7 @@ const Profile = () => {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-4 space-y-6">
             {/* Profile Completion Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -388,7 +406,7 @@ const Profile = () => {
 
                 {/* Bio */}
                 <div className="flex items-center gap-2">
-                  <span>{user.bio ? "✅" : "☐"}</span>
+                  <span>{user.bio ? "☑" : "☐"}</span>
 
                   <span
                     className={`text-sm ${
@@ -401,11 +419,11 @@ const Profile = () => {
 
                 {/* Skills */}
                 <div className="flex items-center gap-2">
-                  <span>{user.skillsOffered?.length > 0 ? "✅" : "☐"}</span>
+                  <span>{user.skillsWanted.length > 0 ? "☑" : "☐"}</span>
 
                   <span
                     className={`text-sm ${
-                      user.skillsOffered?.length > 0
+                      user.skillsWanted.length > 0
                         ? "text-gray-400 line-through"
                         : "text-gray-800"
                     }`}
